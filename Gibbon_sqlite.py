@@ -44,5 +44,18 @@ timers = execute_read_query(select_timers)
 
 
 if __name__ == "__main__":
-    for time in timers:
-        print(time)
+    print('''
+        Comand:
+          1. Clear table Timer
+          2. Add column in Timer
+          3. Delete column in Timer
+    ''')
+
+    cmd =  input('Input num cmd: ')
+    
+    match cmd:
+        case '1':
+            delete_all = 'DELETE from Timer WHERE id > 0'
+            query = execute_query(delete_all)
+
+            print('Delete')
