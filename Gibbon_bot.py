@@ -15,6 +15,8 @@ from utils.check import *
 
 import re
 
+from utils.sql_snipets import *
+
 
 bot = telebot.TeleBot(TOKEN)
 count_sched = 1
@@ -95,12 +97,7 @@ def start(message):
         bot.send_message(message.chat.id, "Выбирите команду:", reply_markup=markup)
 
     elif re.search(r"^❌ Расписание", message.text):
-        deleteSched =f'''
-        DELETE FROM
-            Timer
-        WHERE
-            name='{message.text[13:]}'
-        '''
+        deleteSched = Select().where(f"name='{message.text[13:]}'")
 
         try:
             if not len(schedule.get_jobs()):
@@ -148,14 +145,7 @@ def changeSched(message, name, field):
     if field == 'name':
         answCommand[answCommand.index(f'Расписание {name}')] = f'Расписание {message.text}'
 
-        selectSched = f'''
-        SELECT
-            *
-        FROM
-            Timer
-         WHERE
-            name='{name}'
-        '''
+        selectSched = Select().where(f"name='{name}'")
 
         sched = execute_read_query(selectSched)
 
@@ -165,14 +155,7 @@ def changeSched(message, name, field):
 
     markup = keyboard(answCommand[1:2] + answCommand[3:])
 
-    changeNameSched = f'''
-         UPDATE
-            Timer
-         SET
-            {field}='{message.text}'
-         WHERE
-            name='{name}'
-        '''
+    changeNameSched = Update(f"{field}='{message.text}'").where(f" name='{name}'")
 
     execute_query(changeNameSched)
 
@@ -197,12 +180,7 @@ def stepTimer(message, id_group, name):
 
     print(name, id_group)
 
-    createSched = f'''
-    INSERT INTO
-        Timer (schedule, name, n_lesson, id_group)
-    VALUES
-        ('{message.text}', '{name}', 1, {id_group})
-    '''
+    createSched = Insert(message.text, name, id_group)
 
     if re.search(r"^([а-яА-Я]{2}/?)+\s(\d{2}:\d{2}/?)+$", message.text):
         answCommand.insert(4, f"Расписание {name}")

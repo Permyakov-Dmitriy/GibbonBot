@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 
+from utils.sql_snipets import *
+
 def create_connection(path):
     connection = None
     try:
@@ -16,6 +18,9 @@ def execute_query(query):
     cursor = connection.cursor()
 
     try:
+        if isinstance(query, (Comand, Insert)):
+            query = query.query
+
         cursor.execute(query)
         connection.commit()
         print("Query executed successfully")
@@ -55,7 +60,7 @@ if __name__ == "__main__":
     
     match cmd:
         case '1':
-            query = 'DELETE from Timer WHERE id > 0'
+            query = Delete().where('id > 0')
 
         case '2':
             column = input('Column name: ')
@@ -66,7 +71,7 @@ if __name__ == "__main__":
         case '3':
             id_timer = input('ID: ')
 
-            query = f'DELETE from Timer WHERE id = {id_timer}'
-        
+            query = Delete().where(f'id = {id_timer}')
+                    
 
     query = execute_query(query)
