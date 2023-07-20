@@ -1,9 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
 
 @dataclass
 class Comand:
-    query: str
-
+    '''TODO удалить'''
     def where(self, string):
         self.query += f'''
     WHERE
@@ -15,8 +15,9 @@ class Comand:
 
 @dataclass
 class Select(Comand):
+    '''TODO удалить'''
     rows: list[str] = ('*',)
-    
+
     query: str = f'''
     SELECT
         {', '.join(rows)}
@@ -26,34 +27,31 @@ class Select(Comand):
 
 @dataclass
 class Update(Comand):
+    '''TODO удалить'''
+    st: str
+
     query: str = f'''
     UPDATE
         Timer
-    SET {set}
-    '''
-    set: str
-
-
-@dataclass
-class Delete(Comand):
-    query: str = '''
-    DELETE 
-    FROM
-        Timer
+    SET {self.st}
     '''
 
 
-@dataclass
 class Insert:
-    schedule: str = ''
-    name: str = ''
-    id_group: int = 0
-    n_lesson: int = 1
+    def __init__(self, schedule, name, id_group, n_lesson=1, *args, **kwargs):
+        self.schedule = schedule
+        self.name = name
+        self.id_group = id_group
+        self.n_lesson = n_lesson
 
-    query: str = f'''
-    INSERT INTO
-        Timer (schedule, name, n_lesson, id_group)
-    VALUES
-        ('{schedule}', '{name}', {n_lesson}, {id_group})
-        '''
-    
+        self.query = f'''
+        INSERT INTO
+            Timer (schedule, name, n_lesson, id_group)
+        VALUES
+            ('{self.schedule}', '{self.name}', {self.n_lesson}, {self.id_group})
+            '''
+        
+if __name__ == '__main__':
+    test_u = Update('buybu')
+
+    print(test_u.query)

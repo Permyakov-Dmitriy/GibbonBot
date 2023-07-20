@@ -20,6 +20,7 @@ def execute_query(query):
     try:
         if isinstance(query, (Comand, Insert)):
             query = query.query
+            print(query)
 
         cursor.execute(query)
         connection.commit()
@@ -72,6 +73,6 @@ if __name__ == "__main__":
             id_timer = input('ID: ')
 
             query = Delete().where(f'id = {id_timer}')
-                    
+
 
     query = execute_query(query)

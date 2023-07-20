@@ -180,7 +180,7 @@ def stepTimer(message, id_group, name):
 
     print(name, id_group)
 
-    createSched = Insert(message.text, name, id_group)
+    createSched = Insert(schedule=message.text, name=name, id_group=id_group)
 
     if re.search(r"^([а-яА-Я]{2}/?)+\s(\d{2}:\d{2}/?)+$", message.text):
         answCommand.insert(4, f"Расписание {name}")
