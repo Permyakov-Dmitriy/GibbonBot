@@ -3,14 +3,11 @@ import time
 
 
 def timer_sched(sched, name, func, bot, id):
-    def format(num):
-        if "/" in sched.split()[num]:
-            return sched.split()[num].split("/")
-        
-        return sched.split()[num].split()
+    sch = sched.split()
+    format_sch = [i.split('/') if '/' in i else i.split() for i in sch]
 
-    day = format(0)
-    HH_MM = format(1)
+    day = format_sch[0]
+    HH_MM = format_sch[1]
 
     for i in range(len(day)):
         match day[i]:

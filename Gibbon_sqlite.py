@@ -48,6 +48,7 @@ if __name__ == "__main__":
     Comand:
         1. Clear table Timer
         2. Add column in Timer
+        3. Delete timer for id
     ''')
 
     cmd =  input('Input num cmd: ')
@@ -61,6 +62,11 @@ if __name__ == "__main__":
             type_column = input('Type [int, varchar(255), boolean, ...]: ')
 
             query = f'ALTER TABLE Timer ADD {column} {type_column}'
+
+        case '3':
+            id_timer = input('ID: ')
+
+            query = f'DELETE from Timer WHERE id = {id_timer}'
 
 
     query = execute_query(query)

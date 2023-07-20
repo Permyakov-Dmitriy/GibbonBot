@@ -189,9 +189,9 @@ def stepTimer(message, name):
 
     createSched = f'''
     INSERT INTO
-        Timer (schedule, name)
+        Timer (schedule, name, n_lesson)
     VALUES
-        ('{message.text}', '{name}')'''
+        ('{message.text}', '{name}', 1)'''
 
     if re.search(r"^([а-яА-Я]{2}/?)+\s(\d{2}:\d{2}/?)+$", message.text):
         answCommand.insert(4, f"Расписание {name}")
