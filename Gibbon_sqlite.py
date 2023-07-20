@@ -45,17 +45,22 @@ timers = execute_read_query(select_timers)
 
 if __name__ == "__main__":
     print('''
-        Comand:
-          1. Clear table Timer
-          2. Add column in Timer
-          3. Delete column in Timer
+    Comand:
+        1. Clear table Timer
+        2. Add column in Timer
     ''')
 
     cmd =  input('Input num cmd: ')
     
     match cmd:
         case '1':
-            delete_all = 'DELETE from Timer WHERE id > 0'
-            query = execute_query(delete_all)
+            query = 'DELETE from Timer WHERE id > 0'
 
-            print('Delete')
+        case '2':
+            column = input('Column name: ')
+            type_column = input('Type [int, varchar(255), boolean, ...]: ')
+
+            query = f'ALTER TABLE Timer ADD {column} {type_column}'
+
+
+    query = execute_query(query)
