@@ -67,6 +67,6 @@ if __name__ == "__main__":
             id_timer = input('ID: ')
 
             query = f'DELETE from Timer WHERE id = {id_timer}'
-
+        
 
     query = execute_query(query)

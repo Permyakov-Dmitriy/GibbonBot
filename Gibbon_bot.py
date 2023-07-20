@@ -63,7 +63,7 @@ def start(message):
 
     elif message.text == answCommand[1]:
         mesg = bot.send_message(message.chat.id,'Придумайте название для расписания')
-        bot.register_next_step_handler(mesg, nameTimer)
+        bot.register_next_step_handler(mesg, idGroupForTimer)
 
     elif message.text == answCommand[2]:
         mark = keyboard(answCommand[1:2] + answCommand[3:])
@@ -179,29 +179,41 @@ def changeSched(message, name, field):
     bot.send_message(message.chat.id, f"Записали", reply_markup=markup)
 
 
-def nameTimer(message):
-        mesg = bot.send_message(message.chat.id,'Напишите расписание format: ДН/ДН ЧЧ:MM/ЧЧ:MM exmp. вт/пт 02:05/05:00')
-        bot.register_next_step_handler(mesg, stepTimer, message.text)
+def idGroupForTimer(message):
+        mesg = bot.send_message(message.chat.id, 'Напишите id группы для рассылки')
+        bot.register_next_step_handler(mesg, nameTimer, message.text)
 
 
-def stepTimer(message, name):
+def nameTimer(message, id_group):
+        if not re.search(r'-?\d+', message.text):
+            bot.send_message(message.chat.id, '🚫 Неверный формат id"')
+        else:
+            mesg = bot.send_message(message.chat.id,'Напишите расписание format: ДН/ДН ЧЧ:MM/ЧЧ:MM exmp. вт/пт 02:05/05:00')
+            bot.register_next_step_handler(mesg, stepTimer, message.text, id_group)
+
+
+def stepTimer(message, id_group, name):
     markup = keyboard(answCommand[1:2] + answCommand[3:])
+
+    print(name, id_group)
 
     createSched = f'''
     INSERT INTO
-        Timer (schedule, name, n_lesson)
+        Timer (schedule, name, n_lesson, id_group)
     VALUES
-        ('{message.text}', '{name}', 1)'''
+        ('{message.text}', '{name}', 1, {id_group})
+    '''
 
     if re.search(r"^([а-яА-Я]{2}/?)+\s(\d{2}:\d{2}/?)+$", message.text):
         answCommand.insert(4, f"Расписание {name}")
+
         execute_query(createSched)
 
-        timer_sched(message.text, name, send_f, bot, message.chat.id)
+        timer_sched(message.text, name, send_f, bot, id_group, name)
 
-        bot.send_message(message.chat.id, f"Записали новое расписание", reply_markup=markup)
+        bot.send_message(message.chat.id, "Записали новое расписание", reply_markup=markup)
     else:
-        bot.send_message(message.chat.id, f"🚫 Неверная дата", reply_markup=markup)
+        bot.send_message(message.chat.id, "🚫 Неверная дата", reply_markup=markup)
 
 
 if __name__ == "__main__":
