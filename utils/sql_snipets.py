@@ -1,57 +1,58 @@
-from dataclasses import dataclass
-
-
-@dataclass
 class Comand:
-    '''TODO удалить'''
     def where(self, string):
-        self.query += f'''
-    WHERE
-        {string}
+        self.__query += f'''
+        WHERE
+            {string}
         '''
 
         return self
+    
+
+class GetQuery:
+    def get_query(self):
+        return self.__dict__[list(self.__dict__.keys())[-1]]
 
 
-@dataclass
-class Select(Comand):
-    '''TODO удалить'''
-    rows: list[str] = ('*',)
+class Select(Comand, GetQuery):
+    def __init__(self, rows=['*']):
+        self.rows = rows
 
-    query: str = f'''
-    SELECT
-        {', '.join(rows)}
-    FROM
-        Timer
-    '''
-
-@dataclass
-class Update(Comand):
-    '''TODO удалить'''
-    st: str
-
-    query: str = f'''
-    UPDATE
-        Timer
-    SET {self.st}
-    '''
+        self.__query = f'''
+        SELECT
+            {', '.join(self.rows)}
+        FROM
+            Timer
+        '''
 
 
-class Insert:
-    def __init__(self, schedule, name, id_group, n_lesson=1, *args, **kwargs):
+class Update(Comand, GetQuery):
+    def __init__(self, update):
+        self.update = update
+
+        self.__query = f'''
+        UPDATE
+            Timer
+        SET {self.update}
+        '''
+
+
+class Insert(GetQuery):
+    def __init__(self, schedule, name, id_group, n_lesson=1):
         self.schedule = schedule
         self.name = name
         self.id_group = id_group
         self.n_lesson = n_lesson
 
-        self.query = f'''
+        self.__query = f'''
         INSERT INTO
             Timer (schedule, name, n_lesson, id_group)
         VALUES
             ('{self.schedule}', '{self.name}', {self.n_lesson}, {self.id_group})
-            '''
+        '''
         
 if __name__ == '__main__':
     test_u = Update('buybu')
+    test_i = Insert('', '', 0, 0)
 
-    print(test_u.query)
+    print(test_u.get_query())
+    print(test_i.get_query())
