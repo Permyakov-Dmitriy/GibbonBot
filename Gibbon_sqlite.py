@@ -19,8 +19,7 @@ def execute_query(query):
 
     try:
         if isinstance(query, (Comand, Insert)):
-            query = query.query
-            print(query)
+            query = query._query
 
         cursor.execute(query)
         connection.commit()

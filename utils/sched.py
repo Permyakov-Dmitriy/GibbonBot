@@ -2,7 +2,7 @@ import schedule
 import time
 
 
-def timer_sched(sched, name, func, bot, id, sched_name):
+def timer_sched(sched, name, func, bot, id):
     sch = sched.split()
     format_sch = [i.split('/') if '/' in i else i.split() for i in sch]
 
@@ -20,7 +20,7 @@ def timer_sched(sched, name, func, bot, id, sched_name):
     }
 
     for i in range(len(day)):
-        dict_day[day[i]].at(HH_MM[i]).do(lambda: func(bot, id, sched_name)).tag(f"timer{name}")
+        dict_day[day[i]].at(HH_MM[i]).do(lambda: func(bot, id, name)).tag(f"timer{name}")
 
 
 def schedule_checker():

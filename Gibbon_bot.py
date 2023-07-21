@@ -21,6 +21,7 @@ from utils.sql_snipets import *
 bot = telebot.TeleBot(TOKEN)
 count_sched = 1
 answCommand = ["📄 Документ", "⏱ Таймер", "🗓 Список расписаний", "⌛ Стоп"]
+schedList = []
 
 
 @bot.message_handler(commands=['sendGroup'],func=check_admin)
@@ -46,7 +47,7 @@ def welcome(message):
     for tm in timers:
         if f"Расписание {tm[2]}" not in answCommand:
             timer_sched(tm[1], tm[2], send_f, bot, message.chat.id)
-            answCommand.append(f"Расписание {tm[2]}")
+            schedList.append(f"Расписание {tm[2]}")
 
     mark = keyboard(answCommand[:3])
 
@@ -64,7 +65,7 @@ def start(message):
         bot.delete_message(message.chat.id, wait.message_id)
 
     elif message.text == answCommand[1]:
-        mesg = bot.send_message(message.chat.id,'Придумайте название для расписания')
+        mesg = bot.send_message(message.chat.id,'Придумайте название для расписания', reply_markup=types.ReplyKeyboardRemove())
         bot.register_next_step_handler(mesg, idGroupForTimer)
 
     elif message.text == answCommand[2]:
@@ -73,10 +74,10 @@ def start(message):
 
     elif message.text == answCommand[3]:
         if answCommand[4:]:
-            for i in answCommand[4:]:
-                answCommand.remove(i)
+            for i in schedList:
+                schedList.remove(i)
 
-        mark = keyboard(answCommand[:3])
+        mark = keyboard(answCommand)
         schedule.clear()
         bot.send_message(message.chat.id, "Таймер выключился", reply_markup=mark)
 
@@ -102,6 +103,7 @@ def start(message):
         try:
             if not len(schedule.get_jobs()):
                 markup = keyboard(answCommand[:3])
+
             elif len(schedule.get_jobs()) == 1:
                 markup = keyboard(answCommand[:3])
                 answCommand.remove(f"Расписание {message.text[13:]}")
@@ -109,6 +111,7 @@ def start(message):
                 execute_query(deleteSched)
 
                 schedule.clear(f"timer{message.text[13:]}")
+
             else:
                 answCommand.remove(f"Расписание {message.text[13:]}")
                 markup = keyboard(answCommand[1:2] + answCommand[3:])
@@ -134,7 +137,7 @@ def start(message):
 
 
     else:
-        bot.send_message(message.chat.id, "🙈")
+        bot.send_message(message.chat.id, "🙈", reply_markup=types.ReplyKeyboardRemove())
         bot.send_message(message.from_user.id, 'Команды: /start')
         bot.send_message(message.from_user.id, 'Sms в группу: /sendGroup')
 
@@ -153,7 +156,7 @@ def changeSched(message, name, field):
     else:
         timer_sched(message.text, name, send_f, bot, message.chat.id)
 
-    markup = keyboard(answCommand[1:2] + answCommand[3:])
+    markup = keyboard(answCommand[1:2] + schedList)
 
     changeNameSched = Update(f"{field}='{message.text}'").where(f" name='{name}'")
 
@@ -187,9 +190,9 @@ def stepTimer(message, id_group, name):
 
         execute_query(createSched)
 
-        timer_sched(message.text, name, send_f, bot, id_group, name)
+        timer_sched(message.text, name, send_f, bot, id_group)
 
-        bot.send_message(message.chat.id, "Записали новое расписание", reply_markup=markup)
+        bot.send_message(message.chat.id, "Записали новое расписание", reply_markup=keyboard(answCommand))
     else:
         bot.send_message(message.chat.id, "🚫 Неверная дата", reply_markup=markup)
 

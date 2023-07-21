@@ -10,9 +10,9 @@ def send_f(bot, id, sched_name):
 		try:
 			bot.send_document(id, doc)
 
-			query = Update(set="n_lesson = n_lesson + 1").where(f"name = '{sched_name}'")
+			query = Update("n_lesson = n_lesson + 1").where(f"name = '{sched_name}'")
 
 			execute_query(query)
-		
+
 		except ApiTelegramException:
 			print(f'chat with id({id}) not found')
