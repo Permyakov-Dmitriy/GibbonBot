@@ -15,12 +15,12 @@ from utils.check import *
 
 import re
 
-from utils.sql_snipets import *
+from utils.sql_orm import *
 
 
 bot = telebot.TeleBot(TOKEN)
 count_sched = 1
-answCommand = ["📄 Документ", "⏱ Таймер", "🗓 Список расписаний", "⌛ Стоп"]
+answCommand = ["📄 Документ", "⏱ Таймер", "🗓 Список расписаний", "⌛ Стоп", 'Меню']
 schedList = []
 
 
@@ -37,12 +37,12 @@ def sendMsg(message, id):
     bot.send_message(id, message.text)
 
 
-@bot.message_handler(content_types=["text"],func=check_user)
+@bot.message_handler(content_types=["text"], func=check_user)
 def start(message):
     bot.send_message(message.chat.id, message.text)
 
 
-@bot.message_handler(commands=['start'],func=check_admin)
+@bot.message_handler(commands=['start'], func=check_admin)
 def welcome(message):
     for tm in timers:
         if f"Расписание {tm[2]}" not in answCommand:
@@ -69,7 +69,7 @@ def start(message):
         bot.register_next_step_handler(mesg, idGroupForTimer)
 
     elif message.text == answCommand[2]:
-        mark = keyboard(answCommand[1:2] + answCommand[3:])
+        mark = keyboard(schedList + answCommand[-1:])
         bot.send_message(message.chat.id, "Ваш список", reply_markup=mark)
 
     elif message.text == answCommand[3]:
@@ -80,6 +80,9 @@ def start(message):
         mark = keyboard(answCommand)
         schedule.clear()
         bot.send_message(message.chat.id, "Таймер выключился", reply_markup=mark)
+
+    elif message.text == answCommand[-1]:
+        bot.send_message(message.chat.id, 'Выбирите команду', reply_markup=keyboard(answCommand[:-1]))
 
     elif re.search(r"^Расписание", message.text):
         selectSched = f'''
@@ -181,18 +184,14 @@ def nameTimer(message, id_group):
 def stepTimer(message, id_group, name):
     markup = keyboard(answCommand[1:2] + answCommand[3:])
 
-    print(name, id_group)
-
     createSched = Insert(schedule=message.text, name=name, id_group=id_group)
 
     if re.search(r"^([а-яА-Я]{2}/?)+\s(\d{2}:\d{2}/?)+$", message.text):
-        answCommand.insert(4, f"Расписание {name}")
-
         execute_query(createSched)
 
         timer_sched(message.text, name, send_f, bot, id_group)
 
-        bot.send_message(message.chat.id, "Записали новое расписание", reply_markup=keyboard(answCommand))
+        bot.send_message(message.chat.id, "Записали новое расписание", reply_markup=keyboard(answCommand[:-1]))
     else:
         bot.send_message(message.chat.id, "🚫 Неверная дата", reply_markup=markup)
 

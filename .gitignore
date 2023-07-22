@@ -161,4 +161,4 @@ cython_debug/
 
 # Custome ignore
 TgToken.py
-File/
+Files/

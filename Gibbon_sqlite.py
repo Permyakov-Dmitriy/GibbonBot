@@ -1,7 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 
-from utils.sql_snipets import *
+from utils.sql_orm import *
 
 def create_connection(path):
     connection = None
@@ -33,6 +33,9 @@ def execute_read_query(query):
     connection = create_connection("sm_app.sqlite")
     cursor = connection.cursor()
     result = None
+
+    if isinstance(query, Select):
+            query = query._query
 
     try:
         cursor.execute(query)
