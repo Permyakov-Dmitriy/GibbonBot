@@ -186,7 +186,7 @@ def stepTimer(message, id_group, name):
 
     createSched = Insert(schedule=message.text, name=name, id_group=id_group)
 
-    if re.search(r"^([а-яА-Я]{2}/?)+\s(\d{2}:\d{2}/?)+$", message.text):
+    if re.search(r"^([а-я]{2}\/?)+\s+(\d{2}:\d{2}\/?)+$", message.text):
         execute_query(createSched)
 
         timer_sched(message.text, name, send_f, bot, id_group)
