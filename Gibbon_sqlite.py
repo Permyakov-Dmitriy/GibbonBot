@@ -57,6 +57,7 @@ if __name__ == "__main__":
         1. Clear table Timer
         2. Add column in Timer
         3. Delete timer for id
+        4. Update data in db
     ''')
 
     cmd =  input('Input num cmd: ')
@@ -75,6 +76,16 @@ if __name__ == "__main__":
             id_timer = input('ID: ')
 
             query = Delete().where(f'id = {id_timer}')
+
+        case '4':
+            id_row = input('ID: ')
+            column = input('Column: ')
+            new_val = input('New value: ')
+
+            if column in ["schedule", "name"]:
+                new_val = "'" + new_val + "'"
+
+            query = Update(f'{column} = {new_val}').where(f'id = {id_row}')
 
 
     query = execute_query(query)
