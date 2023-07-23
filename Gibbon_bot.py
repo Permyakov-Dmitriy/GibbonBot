@@ -57,7 +57,7 @@ def welcome(message):
 @bot.message_handler(content_types=["text"],func=check_admin)
 def start(message):
     if message.text == answCommand[0]:
-        doc = open('Files/CW14.pdf', 'rb')
+        doc = open('Files/gibbon.txt', 'rb')
 
         wait = bot.send_message(message.chat.id, 'Ожидайте...')
 
@@ -85,14 +85,7 @@ def start(message):
         bot.send_message(message.chat.id, 'Выбирите команду', reply_markup=keyboard(answCommand[:-1]))
 
     elif re.search(r"^Расписание", message.text):
-        selectSched = f'''
-        SELECT
-            schedule
-        FROM
-            Timer
-         WHERE
-            name='{message.text.split()[1]}'
-        '''
+        selectSched = Select(['schedule']).where(f"name='{message.text.split()[1]}'")
 
         timer = execute_read_query(selectSched)
 
@@ -101,7 +94,7 @@ def start(message):
         bot.send_message(message.chat.id, "Выбирите команду:", reply_markup=markup)
 
     elif re.search(r"^❌ Расписание", message.text):
-        deleteSched = Select().where(f"name='{message.text[13:]}'")
+        deleteSched = Delete().where(f"name='{message.text[13:]}'")
 
         try:
             if not len(schedule.get_jobs()):
@@ -109,14 +102,14 @@ def start(message):
 
             elif len(schedule.get_jobs()) == 1:
                 markup = keyboard(answCommand[:3])
-                answCommand.remove(f"Расписание {message.text[13:]}")
+                schedList.remove(f"Расписание {message.text[13:]}")
 
                 execute_query(deleteSched)
 
                 schedule.clear(f"timer{message.text[13:]}")
 
             else:
-                answCommand.remove(f"Расписание {message.text[13:]}")
+                schedList.remove(f"Расписание {message.text[13:]}")
                 markup = keyboard(answCommand[1:2] + answCommand[3:])
 
                 execute_query(deleteSched)
@@ -125,7 +118,8 @@ def start(message):
 
             bot.send_message(message.chat.id, f"Расписание {message.text[13:]} удалили", reply_markup=markup)
 
-        except Exception:
+        except Exception as e:
+            print(e)
             bot.send_message(message.chat.id, f"Расписание {message.text[13:]} не существует")
 
 
@@ -187,6 +181,8 @@ def stepTimer(message, id_group, name):
     createSched = Insert(schedule=message.text, name=name, id_group=id_group)
 
     if re.search(r"^([а-я]{2}\/?)+\s+(\d{2}:\d{2}\/?)+$", message.text):
+        schedList.append(f"Расписание {name}")
+
         execute_query(createSched)
 
         timer_sched(message.text, name, send_f, bot, id_group)
